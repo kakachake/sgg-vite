@@ -26,7 +26,6 @@ export function pluginIndexHtml(): Plugin {
       return () => {
         server.middlewares.use(async (req, res, next) => {
           let html = await fs.readFile(DEFAULT_HTML_PATH, 'utf-8');
-
           try {
             html = await server.transformIndexHtml(
               req.url,

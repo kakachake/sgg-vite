@@ -80,6 +80,7 @@
     "remark-rehype": "^10.1.0",
     "shiki": "^0.12.1",
     "unified": "^10.1.2",
+    "unocss": "^0.48.4",
     "vite": "3.1.4"
   },
   "lint-staged": {

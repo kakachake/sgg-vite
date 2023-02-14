@@ -31,8 +31,8 @@ export function pluginConfig(config: SiteConfig, restart?: () => void): Plugin {
       if (include(ctx.file)) {
         console.log(config.root);
         console.log(`
-        \n${path.relative(config.root, ctx.file)} changed, 
-        \nrestarting server...
+        ${path.relative(config.root, ctx.file)} changed, 
+        restarting server...
         `);
 
         // 调用dev.ts中的createServer
@@ -44,6 +44,11 @@ export function pluginConfig(config: SiteConfig, restart?: () => void): Plugin {
         resolve: {
           alias: {
             '@runtime': RUNTIME_PATH
+          },
+          css: {
+            modules: {
+              localsConvention: 'camelCaseOnly'
+            }
           }
         }
       };

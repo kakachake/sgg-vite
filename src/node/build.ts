@@ -17,7 +17,7 @@ export async function bundle(root: string, config: SiteConfig) {
     mode: 'production',
     root,
     ssr: {
-      noExternal: ['react-router-dom']
+      noExternal: ['react-router-dom', 'lodash-es']
     },
     plugins: (await createVitePlugins(config, undefined, isServer)) as Plugin[],
     build: {
@@ -54,14 +54,31 @@ export async function renderPage(
   clientBundle: RollupOutput,
   routes: Route[]
 ) {
-  const clientChunk = clientBundle.output.find(
-    (chunk) => chunk.type === 'chunk' && chunk.isEntry
+  console.log(
+    'clientBundle',
+    clientBundle.output.map((chunk) => {
+      return {
+        type: chunk.type,
+        fileName: chunk.fileName,
+        isEntry: chunk.type === 'chunk' && chunk.isEntry
+      };
+    })
   );
+
+  const clientChunk = clientBundle.output.filter(
+    (chunk) =>
+      (chunk.type === 'chunk' && chunk.isEntry) || chunk.type === 'asset'
+  );
+
+  const clientAssets = clientBundle.output.filter(
+    (chunk) => chunk.type === 'asset'
+  );
+
   console.log('Rendering page in server side...');
   await Promise.all(
     routes.map(async (route) => {
       const routePath = route.path;
-      const appHtml = render(routePath);
+      const appHtml = await render(routePath);
       const html = `
     <!DOCTYPE html>
     <html>
@@ -70,10 +87,21 @@ export async function renderPage(
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <title>title</title>
         <meta name="description" content="xxx">
+        ${clientChunk
+          ?.map((chunk) => {
+            if (chunk.type === 'asset') {
+              return `<link rel="stylesheet" href="/${chunk.fileName}">`;
+            }
+          })
+          .join('')}
       </head>
       <body>
         <div id="root">${appHtml}</div>
-        <script type="module" src="/${clientChunk?.fileName}"></script>
+        ${clientChunk
+          ?.map((chunk) => {
+            return `<script type="module" src="/${chunk.fileName}"></script>`;
+          })
+          .join('')}
       </body>
     </html>`.trim();
       const fileName = routePath.endsWith('/')

@@ -10,7 +10,8 @@
     "baseUrl": "src",
     "paths": {
       "shared/*": ["shared/*"],
-      "@runtime": ["runtime/index.ts"]
+      "@runtime": ["runtime/index.ts"],
+      "theme-default/*": ["theme-default/*"]
     }
   },
   "include": ["src/**/*"]

@@ -1,27 +1,34 @@
 import { SiteConfig } from '../../shared/types';
-import { normalizePath, Plugin, ViteDevServer } from 'vite';
-import path from 'path';
+import { normalizePath, Plugin } from 'vite';
+import path, { join } from 'path';
 import { PACKAGE_ROOT, RUNTIME_PATH } from 'node/constants';
+import sirv from 'sirv';
 
 const SITE_DATA_ID = 'island:site-data';
+const DEV_ROOT = 'island:dev-root';
 
 export function pluginConfig(config: SiteConfig, restart?: () => void): Plugin {
-  let server: ViteDevServer | null = null;
   return {
-    name: 'island:site-data',
+    name: 'island:config',
     resolveId(id) {
       if (id === SITE_DATA_ID) {
         return '\0' + SITE_DATA_ID;
+      }
+      if (id === DEV_ROOT) {
+        return '\0' + DEV_ROOT;
       }
     },
     load(id) {
       if (id === '\0' + SITE_DATA_ID) {
         return `export default ${JSON.stringify(config.siteData)}`;
       }
+      if (id === '\0' + DEV_ROOT) {
+        return `export default ${JSON.stringify(normalizePath(process.cwd()))}`;
+      }
     },
-    configureServer(_server) {
-      // 获取vite dev server实例
-      server = _server;
+    configureServer(server) {
+      const publicDir = join(config.root, 'public');
+      server.middlewares.use(sirv(publicDir));
     },
     async handleHotUpdate(ctx) {
       const customWatchedFiles = [normalizePath(config.configPath)];
@@ -41,9 +48,11 @@ export function pluginConfig(config: SiteConfig, restart?: () => void): Plugin {
     },
     config() {
       return {
+        root: PACKAGE_ROOT,
         resolve: {
           alias: {
-            '@runtime': RUNTIME_PATH
+            '@runtime': RUNTIME_PATH,
+            'theme-default': path.resolve(PACKAGE_ROOT, 'src/theme-default')
           },
           css: {
             modules: {

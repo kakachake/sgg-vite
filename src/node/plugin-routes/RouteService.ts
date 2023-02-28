@@ -23,6 +23,7 @@ export class RouteService {
         ignore: ['**/build/**', '**/.island/**', '**/config.ts']
       })
       .sort();
+
     files.forEach((file) => {
       const fileRelativePath = normalizePath(
         path.relative(this.#scanDir, file)
@@ -46,6 +47,7 @@ export class RouteService {
             : `const Route${index} = loadable(() => import('${route.absolutePath}'));`;
         })
         .join('\n')}
+      
       export const routes = [
         ${this.#routeData
           .map((route, index) => {

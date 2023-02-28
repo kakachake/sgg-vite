@@ -5,8 +5,6 @@ import Slugger from 'github-slugger';
 import { parse } from 'acorn';
 import type { Program } from 'mdast-util-mdxjs-esm';
 
-const slugger = new Slugger();
-
 interface ChildNode {
   type: 'link' | 'text' | 'inlineCode';
   value: string;
@@ -22,7 +20,7 @@ interface TocItem {
 export const remarkPluginToc: Plugin<[], Root> = () => {
   return (tree) => {
     const toc: TocItem[] = [];
-
+    const slugger = new Slugger();
     visit(tree, 'heading', (node) => {
       if (!node.depth || !node.children?.length) {
         return;
@@ -41,6 +39,7 @@ export const remarkPluginToc: Plugin<[], Root> = () => {
           })
           .join('');
         const id = slugger.slug(originText);
+
         toc.push({
           id,
           text: originText,

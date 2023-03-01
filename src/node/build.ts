@@ -70,11 +70,7 @@ export async function renderPage(
       (chunk.type === 'chunk' && chunk.isEntry) || chunk.type === 'asset'
   );
 
-  const clientAssets = clientBundle.output.filter(
-    (chunk) => chunk.type === 'asset'
-  );
-
-  console.log('Rendering page in server side...');
+  console.log('Rendering page in server side...', routes);
   await Promise.all(
     routes.map(async (route) => {
       const routePath = route.path;
@@ -112,7 +108,7 @@ export async function renderPage(
       await fs.writeFile(join(root, 'build', fileName), html);
     })
   );
-  await fs.remove(join(root, '.temp'));
+  // await fs.remove(join(root, '.temp'));
 }
 
 export async function build(root: string = process.cwd(), config: SiteConfig) {

@@ -1,5 +1,5 @@
 import fastGlob from 'fast-glob';
-
+import { globSync } from 'glob';
 import path from 'node:path';
 import { normalizePath } from 'vite';
 
@@ -31,7 +31,7 @@ export class RouteService {
     files.forEach((file) => {
       const filePath = normalizePath(file);
       const fileRelativePath = normalizePath(
-        path.relative(this.#scanDir, filePath)
+        path.relative(normalizePath(this.#scanDir), filePath)
       );
       const routePath = this.normalizeRoutePath(fileRelativePath);
       this.#routeData.push({

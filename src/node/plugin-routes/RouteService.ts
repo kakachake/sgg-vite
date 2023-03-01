@@ -1,5 +1,5 @@
 import fastGlob from 'fast-glob';
-import { globSync } from 'glob';
+
 import path from 'node:path';
 import { normalizePath } from 'vite';
 
@@ -19,17 +19,19 @@ export class RouteService {
   async init() {
     console.log(this.#scanDir);
 
-    const files = globSync(['**/*.{js,jsx,ts,tsx,md,mdx}'], {
-      cwd: this.#scanDir,
-      absolute: true,
-      ignore: ['**/build/**', '**/.island/**', '**/config.ts', '**/temp/*.js']
-    }).sort();
+    const files = fastGlob
+      .sync(['**/*.{js,jsx,ts,tsx,md,mdx}'], {
+        cwd: this.#scanDir,
+        absolute: true,
+        ignore: ['**/build/**', '**/.island/**', '**/config.ts', '**/temp/*.js']
+      })
+      .sort();
     console.log(files);
 
     files.forEach((file) => {
       const filePath = normalizePath(file);
       const fileRelativePath = normalizePath(
-        path.relative(normalizePath(this.#scanDir), filePath)
+        path.relative(this.#scanDir, filePath)
       );
       const routePath = this.normalizeRoutePath(fileRelativePath);
       this.#routeData.push({

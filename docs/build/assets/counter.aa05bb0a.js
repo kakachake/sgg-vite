@@ -1,0 +1,1 @@
+import{r as n,j as o,a as s}from"./client-entry.b730ce15.js";function a(){const[t,e]=n.exports.useState(0);return o("div",{children:s("button",{onClick:()=>{e(r=>r+1)},children:["\u70B9\u51FB ",t]})})}export{a as default};

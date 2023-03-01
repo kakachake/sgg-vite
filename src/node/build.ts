@@ -108,7 +108,7 @@ export async function renderPage(
       await fs.writeFile(join(root, 'build', fileName), html);
     })
   );
-  await fs.remove(join(root, '_temp'));
+  // await fs.remove(join(root, '_temp'));
 }
 
 export async function build(root: string = process.cwd(), config: SiteConfig) {

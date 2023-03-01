@@ -22,7 +22,7 @@ export async function bundle(root: string, config: SiteConfig) {
     plugins: (await createVitePlugins(config, undefined, isServer)) as Plugin[],
     build: {
       ssr: isServer,
-      outDir: isServer ? path.join(root, '.temp') : path.join(root, 'build'),
+      outDir: isServer ? path.join(root, '_temp') : path.join(root, 'build'),
       rollupOptions: {
         input: isServer ? SERVER_ENTRY_PATH : CLIENT_ENTRY_PATH,
         output: {
@@ -108,14 +108,14 @@ export async function renderPage(
       await fs.writeFile(join(root, 'build', fileName), html);
     })
   );
-  // await fs.remove(join(root, '.temp'));
+  await fs.remove(join(root, '_temp'));
 }
 
 export async function build(root: string = process.cwd(), config: SiteConfig) {
   // 1. bundle - client 端 + server 端
   const [clientBundle] = await bundle(root, config);
   // 2. 引入 server-entry 模块
-  const serverEntryPath = join(root, '.temp', 'ssr-entry.js');
+  const serverEntryPath = join(root, '_temp', 'ssr-entry.js');
   const { render, routes } = await import(
     pathToFileURL(serverEntryPath).toString()
   );

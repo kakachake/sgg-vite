@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Header } from 'shared/types';
+import type { Header } from 'shared/types';
 import path from 'path';
 
 export function useHeaders(initHeaders: Header[]) {
   const [headers, setHeaders] = useState(initHeaders);
 
   useEffect(() => {
+    console.log('env', import.meta.env);
+
     if (import.meta.env.DEV) {
       import('island:dev-root').then((res) => {
         import.meta.hot.on('mdx-changed', ({ filePath }) => {

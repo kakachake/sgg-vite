@@ -21,7 +21,7 @@ export class RouteService {
     const files = globSync(['**/*.{js,jsx,ts,tsx,md,mdx}'], {
       cwd: this.#scanDir,
       absolute: true,
-      ignore: ['**/build/**', '**/.island/**', '**/config.ts', '**/temp/*.js']
+      ignore: ['**/build/**', '**/.island/**', '**/config.ts', '**/temp/**/*']
     }).sort();
     console.log(files);
 

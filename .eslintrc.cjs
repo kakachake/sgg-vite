@@ -1,4 +1,8 @@
-module.exports = {
+module.exports = {  
+  env: {
+    browser: true,
+    node: true,
+  },
   extends: [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -21,7 +25,8 @@ module.exports = {
     semi: ["error", "always"],
     "react/react-in-jsx-scope": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
-    "react/no-unknown-property": "off"
+    "react/no-unknown-property": "off",
+    "no-import-assign": "off",
   },
   settings: {
     react: {

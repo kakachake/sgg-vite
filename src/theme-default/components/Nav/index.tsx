@@ -3,11 +3,11 @@ import { NavItemWithLink } from 'shared/types';
 import { SwitchAppearance } from '../SwitchAppearance';
 import styles from './index.module.scss';
 
-function MenuItem(props: NavItemWithLink) {
+function MenuItem({ item }: { item: NavItemWithLink }) {
   return (
     <div className="text-sm font-medium mx-3">
-      <a href={props.link} className={styles.link}>
-        {props.text}
+      <a href={item.link} className={styles.link}>
+        {item.text}
       </a>
     </div>
   );
@@ -36,7 +36,7 @@ export function Nav() {
         <div flex="~">
           <div flex="~">
             {nav.map((item) => {
-              return <MenuItem key={item.text} {...item} />;
+              return <MenuItem key={item.text} item={item} />;
             })}
           </div>
           <div before="menu-item-before" flex="~">

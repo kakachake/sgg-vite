@@ -1,6 +1,6 @@
 import { usePageData, Content } from '@runtime';
 import { useLocation } from 'react-router-dom';
-import Aside from 'theme-default/components/Aside';
+import Aside from '../../components/Aside';
 import DocFooter from 'theme-default/components/DocFooter';
 import Sidebar from 'theme-default/components/Sidebar';
 import style from './index.module.scss';
@@ -29,7 +29,7 @@ function DocLayout() {
         </div>
 
         <div className={style['aside-container']}>
-          <Aside toc={toc} />
+          <Aside toc={toc} __island />
         </div>
       </div>
     </div>

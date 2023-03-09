@@ -1,16 +1,13 @@
 import { useRef, useEffect } from 'react';
 import { Header } from 'shared/types';
-import {
-  bindingAsideScroll,
-  scrollToTarget
-} from 'theme-default/logic/asideScroll';
-import { useHeaders } from 'theme-default/logic/useHeaders';
-
+import { bindingAsideScroll, scrollToTarget } from '../../logic/asideScroll';
+import { useHeaders } from '../../logic/useHeaders';
+import { PropsWithIsland } from 'shared/types';
 interface AsideProps {
   toc: Header[];
 }
 
-function Aside(props: AsideProps) {
+function Aside(props: AsideProps & PropsWithIsland) {
   const { toc = [] } = props;
 
   const headers = useHeaders(toc);

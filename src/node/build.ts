@@ -2,7 +2,9 @@ import { build as viteBuild, InlineConfig } from 'vite';
 import type { RollupOutput } from 'rollup';
 import {
   CLIENT_ENTRY_PATH,
+  EXTERNALS,
   MASK_SPLITTER,
+  PACKAGE_ROOT,
   SERVER_ENTRY_PATH
 } from './constants';
 import path, { dirname, join } from 'path';
@@ -14,6 +16,9 @@ import { createVitePlugins } from './vitePlugins';
 import type { Plugin } from 'vite';
 import { Route } from './plugin-routes';
 import { RenderResult } from 'runtime/ssr-entry';
+import { HelmetData } from 'react-helmet-async';
+
+const CLIENT_OUTPUT = 'build';
 
 export async function bundle(root: string, config: SiteConfig) {
   const resolveViteConfig = async (
@@ -27,12 +32,15 @@ export async function bundle(root: string, config: SiteConfig) {
     plugins: (await createVitePlugins(config, undefined, isServer)) as Plugin[],
     build: {
       ssr: isServer,
-      outDir: isServer ? path.join(root, 'temp') : path.join(root, 'build'),
+      outDir: isServer
+        ? path.join(root, 'temp')
+        : path.join(root, CLIENT_OUTPUT),
       rollupOptions: {
         input: isServer ? SERVER_ENTRY_PATH : CLIENT_ENTRY_PATH,
         output: {
           format: isServer ? 'cjs' : 'esm'
-        }
+        },
+        external: EXTERNALS
       }
     }
   });
@@ -47,6 +55,11 @@ export async function bundle(root: string, config: SiteConfig) {
       // server build
       viteBuild(await resolveViteConfig(true))
     ]);
+    const publicDir = join(root, 'public');
+    if (fs.pathExistsSync(publicDir)) {
+      fs.copy(publicDir, join(root, CLIENT_OUTPUT));
+    }
+    await fs.copy(join(PACKAGE_ROOT, 'vendors'), join(root, CLIENT_OUTPUT));
     return [clientBundle, serverBundle] as [RollupOutput, RollupOutput];
   } catch (e) {
     console.log(e);
@@ -82,8 +95,12 @@ async function buildIslands(
     build: {
       outDir: path.join(root, 'temp'),
       rollupOptions: {
-        input: injectId
+        input: injectId,
+        external: EXTERNALS
       }
+    },
+    esbuild: {
+      jsx: 'automatic'
     },
     plugins: [
       ...(await createVitePlugins(config, undefined, true)),
@@ -117,7 +134,7 @@ async function buildIslands(
 }
 
 export async function renderPage(
-  render: (pagePath: string) => RenderResult,
+  render: (pagePath: string, helmetContext: object) => RenderResult,
   root: string,
   clientBundle: RollupOutput,
   routes: Route[],
@@ -143,28 +160,54 @@ export async function renderPage(
   await Promise.all(
     routes.map(async (route) => {
       const routePath = route.path;
+      const helmetContext = {
+        context: {}
+      } as HelmetData;
+      const {
+        appHTML,
+        islandToPathMap,
+        islandProps = []
+      } = await render(routePath, helmetContext.context);
 
-      const { appHTML, islandToPathMap, islandProps } = await render(routePath);
+      const normalizeVendorFilename = (fileName: string) =>
+        fileName.replace(/\//g, '_') + '.js';
+      const islandBundle = await buildIslands(root, islandToPathMap, config);
+      const islandsCode = (islandBundle as RollupOutput).output[0].code;
 
-      await buildIslands(root, islandToPathMap, config);
+      const { helmet } = helmetContext.context;
+
       const html = `
     <!DOCTYPE html>
     <html>
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>title</title>
+        ${helmet?.title?.toString() || ''}
+        ${helmet?.meta?.toString() || ''}
+        ${helmet?.link?.toString() || ''}
+        ${helmet?.style?.toString() || ''}
         <meta name="description" content="xxx">
         ${clientChunk
           ?.map((chunk) => {
-            if (chunk.type === 'asset') {
+            if (chunk.type === 'asset' && chunk.fileName.endsWith('.css')) {
               return `<link rel="stylesheet" href="/${chunk.fileName}">`;
             }
           })
-          .join('')}
+          .join('\n')}
+        <script type="importmap">
+        {
+          "imports":{
+            ${EXTERNALS.map(
+              (name) => `"${name}": "/${normalizeVendorFilename(name)}"`
+            ).join(',')}
+          }
+        }
+        </script>
       </head>
       <body>
         <div id="root">${appHTML}</div>
+        <script type="module">${islandsCode}</script>
+        <script id="island-props">${JSON.stringify(islandProps)}</script>
         ${clientChunk
           ?.map((chunk) => {
             return `<script type="module" src="/${chunk.fileName}"></script>`;

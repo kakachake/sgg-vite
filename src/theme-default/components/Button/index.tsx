@@ -12,7 +12,7 @@ interface ButtonProps {
   className?: string;
 }
 
-function Button(props: ButtonProps) {
+function Button(props: ButtonProps): any {
   const {
     size = 'big',
     theme = 'brand',

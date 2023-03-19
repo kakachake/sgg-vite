@@ -160,6 +160,7 @@ export async function renderPage(
   await Promise.all(
     [
       ...routes,
+
       {
         path: '/404'
       }

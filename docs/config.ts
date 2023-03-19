@@ -1,6 +1,4 @@
-import { defineConfig } from '../dist';
-
-export default defineConfig({
+export default {
   title: '123',
   description: '121152',
   themeConfig: {
@@ -44,4 +42,4 @@ export default defineConfig({
     }
   },
   vite: {}
-});
+};

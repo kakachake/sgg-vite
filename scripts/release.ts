@@ -81,26 +81,26 @@ async function main() {
 
   if (!confirm) return;
 
-  // step('\nRunnning tests...');
-  // await run('pnpm', ['test:unit']);
-  // await run('pnpm', ['test:e2e']);
+  step('\nRunnning tests...');
+  await run('pnpm', ['test:unit']);
+  await run('pnpm', ['test:e2e']);
 
-  // if (!isDry) {
-  //   step('\nUpdate version...');
-  //   updateVersion(targetVersion);
-  // }
-  // step('\nBuilding package...');
-  // await run('pnpm', ['build']);
+  if (!isDry) {
+    step('\nUpdate version...');
+    updateVersion(targetVersion);
+  }
+  step('\nBuilding package...');
+  await run('pnpm', ['build']);
 
-  // step('\nGenerating changelog...');
-  // await run('pnpm', ['changelog']);
+  step('\nGenerating changelog...');
+  await run('pnpm', ['changelog']);
 
   step('\nCommitting changes...');
   await run('git', ['add', '-A']);
   await run('git', ['commit', '-m', `release: v${targetVersion}`]);
 
   step('\nPublishing packages');
-  await run('pnpm', ['publish', '--access', 'public']);
+  await run('npm', ['publish', '--access', 'public']);
 
   step('\nPublishing to GitHub');
   await run('git', ['tag', `v${targetVersion}`]);

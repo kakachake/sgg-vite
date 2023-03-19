@@ -1,4 +1,4 @@
-.eslintrc.cjs
+
 node_modules
 package.json
 pnpm-lock.yaml
@@ -7,3 +7,4 @@ bin
 esm-cjs
 docs
 *.d.ts
+vendors

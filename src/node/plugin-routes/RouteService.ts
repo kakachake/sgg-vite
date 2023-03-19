@@ -39,7 +39,7 @@ export class RouteService {
     console.log('routeData:', this.#routeData);
   }
 
-  generateRouteCode(ssr: boolean) {
+  generateRouteCode(ssr?: boolean) {
     return `
       import React from 'react';
       ${ssr ? '' : 'import loadable from "@loadable/component";'};

@@ -34,17 +34,21 @@ describe('RouteService', async () => {
     const routeCode = routeService.generateRouteCode();
     expect(routeCode).toMatchInlineSnapshot(`
       "
-            import React from 'react'
-            import Route0 from 'E:/frontEnd/sgg/island-dev/src/node/plugin-routes/fixtures/a.mdx'
-      import Route1 from 'E:/frontEnd/sgg/island-dev/src/node/plugin-routes/fixtures/guide/index.mdx';
+            import React from 'react';
+            import loadable from \\"@loadable/component\\";;
+            const Route0 = loadable(() => import('E:/frontEnd/sgg/island-dev/src/node/plugin-routes/fixtures/a.mdx'));
+      const Route1 = loadable(() => import('E:/frontEnd/sgg/island-dev/src/node/plugin-routes/fixtures/guide/index.mdx'));
+            
             export const routes = [
               {
                   path: '/a',
-                  element: React.createElement(Route0)
+                  element: React.createElement(Route0),
+                  preload: () => import('E:/frontEnd/sgg/island-dev/src/node/plugin-routes/fixtures/a.mdx')
                 },
       {
                   path: '/guide/',
-                  element: React.createElement(Route1)
+                  element: React.createElement(Route1),
+                  preload: () => import('E:/frontEnd/sgg/island-dev/src/node/plugin-routes/fixtures/guide/index.mdx')
                 }
             ]
           "

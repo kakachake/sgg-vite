@@ -3,6 +3,7 @@ import { normalizePath, Plugin } from 'vite';
 import path, { join } from 'path';
 import { PACKAGE_ROOT, RUNTIME_PATH } from 'node/constants';
 import sirv from 'sirv';
+import fs from 'fs-extra';
 
 const SITE_DATA_ID = 'island:site-data';
 const DEV_ROOT = 'island:dev-root';
@@ -28,7 +29,9 @@ export function pluginConfig(config: SiteConfig, restart?: () => void): Plugin {
     },
     configureServer(server) {
       const publicDir = join(config.root, 'public');
-      server.middlewares.use(sirv(publicDir));
+      if (fs.existsSync(publicDir)) {
+        server.middlewares.use(sirv(publicDir));
+      }
     },
     async handleHotUpdate(ctx) {
       const customWatchedFiles = [normalizePath(config.configPath)];
